@@ -47,6 +47,21 @@ class LUApp(tk.Tk):
         self.minsize(1000, 680)
         self.configure(bg=COLOR_BG)
 
+        # Cargar icono de la aplicación
+        icon_ico = Path(__file__).resolve().parent / "icon.ico"
+        icon_png = Path(__file__).resolve().parent / "icon.png"
+        if icon_ico.exists():
+            try:
+                self.iconbitmap(str(icon_ico))
+            except Exception:
+                pass
+        if icon_png.exists():
+            try:
+                self._app_icon_photo = tk.PhotoImage(file=str(icon_png))
+                self.iconphoto(True, self._app_icon_photo)
+            except Exception:
+                pass
+
         # Variables de control
         self.matrix_size = tk.IntVar(value=3)
         self.method_var = tk.StringVar(value="pivot")       # "pivot" o "no_pivot"

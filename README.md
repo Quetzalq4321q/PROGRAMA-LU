@@ -1,160 +1,259 @@
 # Analizador y Calculador de Descomposición LU
 
-![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)
-![Docker](https://img.shields.io/badge/docker-ready-blue?logo=docker)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Tests](https://img.shields.io/badge/tests-11%20passing-brightgreen.svg)
-
-Software de álgebra lineal numérica para realizar la **Descomposición LU** de matrices cuadradas $N \times N$, implementando el método de **Doolittle clásico ($A = L \cdot U$)** y **Doolittle con pivoteo parcial ($P \cdot A = L \cdot U$)**, resolución simultánea de sistemas de ecuaciones lineales $A \cdot x = b$, representación en **fracciones analíticas exactas** o **decimales**, desglose paso a paso y empaquetado en **Docker**.
+Programa en Python para el cálculo y análisis de la Descomposición LU de matrices cuadradas de orden N x N. Implementa el método de Doolittle clásico (A = L * U) y el método de Doolittle con pivoteo parcial (P * A = L * U), con soporte para cálculo exacto en fracciones o aproximación decimal, resolución de sistemas de ecuaciones lineales y desglose analítico paso a paso.
 
 ---
 
-## 📑 Tabla de Contenidos
-1. [Características Principales](#-características-principales)
-2. [Arquitectura del Proyecto](#-arquitectura-del-proyecto)
-3. [Ejecución con Docker (Sin necesidad de instalar Python)](#-ejecución-con-docker-sin-python-instalado)
-4. [Ejecución Local en Windows/Linux/macOS](#-ejecución-local)
-5. [Casos de Prueba y Resultados](#-casos-de-prueba-y-resultados)
-6. [Flujo de Git y Repositorio](#-repositorio-github)
+## Indice
+
+1. Caracteristicas
+2. Documentacion del Codigo y Estructura
+3. Fundamento Matematico
+4. Guia de Uso y Ejecucion
+   - Ejecucion con Docker (sin instalar Python)
+   - Ejecucion en Windows (acceso directo)
+   - Ejecucion por linea de comandos
+5. Casos de Prueba Verificados
+6. Pruebas Unitarias
+7. Repositorio
 
 ---
 
-## 🌟 Características Principales
+## 1. Caracteristicas
 
-- **Doble Modo de Entrada Flexible:**
-  - **Cuadrícula Visual ($N \times N$):** Interfaz interactiva con celdas independientes, navegación ergonómica mediante flechas del teclado (`↑`, `↓`, `←`, `→`), `Tab` y `Enter`.
-  - **Texto Plano:** Permite pegar matrices directamente desde apuntes, Excel, MATLAB o Python (filas delimitadas por saltos de línea, espacios, comas o `;`).
-  - **Sincronización Bidireccional:** Un clic para convertir de cuadrícula a texto plano o viceversa.
-- **Precisión Aritmética:**
-  - **Fracciones exactas:** Sin errores de redondeo numérico (ej. `1/3`, `-3/4`, `9/4`).
-  - **Decimales:** Con selector de precisión configurable (de 1 a 8 decimales).
-- **Resolución de Sistemas $A \cdot x = b$:**
-  - Sustitución progresiva: $L \cdot y = P \cdot b$.
-  - Sustitución regresiva: $U \cdot x = y$.
-- **Transparencia Analítica:** Pestaña de procedimiento paso a paso que expone fórmulas, multiplicadores y sumas calculadas en cada iteración.
-- **Multiplataforma y Portable:** Funciona en Windows, Linux, macOS y dentro de contenedores Docker.
+- Doble modalidad de entrada: Cuadricula visual interactiva de tamano N x N y caja de texto plano con soporte de copiado y pegado directo desde hojas de calculo, MATLAB o apuntes.
+- Sincronizacion bidireccional entre la cuadricula visual y el texto plano.
+- Precision analitica: Soporte para fracciones exactas mediante la biblioteca estandar de Python, evitando errores de redondeo por punto flotante.
+- Modo decimal configurable de 1 a 8 cifras decimales.
+- Resolucion opcional de sistemas de ecuaciones lineales A * x = b mediante sustitucion progresiva y regresiva.
+- Generacion de reporte detallado con operaciones aritmeticas paso a paso.
+- Empaquetado completo en Docker para ejecucion portable en cualquier sistema operativo.
 
 ---
 
-## 📂 Arquitectura del Proyecto
+## 2. Documentacion del Codigo y Estructura
 
-El código está organizado siguiendo principios de responsabilidad única y bajo acoplamiento:
+El proyecto esta organizado bajo una arquitectura modular desacoplada en la que cada componente cumple una funcion especifica e independiente.
+
+### Mapa de Archivos
 
 ```text
 ANALIZADOR LU/
-├── core/                       # Motor matemático central
-│   ├── __init__.py             # API unificada del núcleo
-│   ├── models.py               # Estructuras de datos (LUResult, SystemSolution)
-│   ├── parsers.py              # Parseo tolerante de texto a matrices
-│   ├── matrix_ops.py           # Álgebra matricial (matmul, mat_vec_mul, identidad)
-│   ├── formatters.py           # Alineación tipográfica y generación de reportes
-│   ├── doolittle.py            # Algoritmo de Doolittle clásico (A = L·U)
-│   ├── doolittle_pivot.py      # Algoritmo de Doolittle con pivoteo (P·A = L·U)
-│   └── linear_system.py        # Sustitución hacia adelante y hacia atrás
-├── examples/                   # Casos de prueba representativos
-│   ├── __init__.py
-│   └── presets.py              # Matrices precargadas (3x3 clásico, 3x3 pivote 0, 4x4, 2x2)
-├── tests/                      # Suite de pruebas unitarias
-│   ├── test_parsers.py         # Pruebas de lectura y parseo
-│   ├── test_doolittle.py       # Pruebas del método sin pivoteo
-│   ├── test_pivot.py           # Pruebas de pivoteo parcial
-│   └── test_system.py          # Pruebas de resolución de sistemas Ax = b
-├── gui.py                      # Interfaz gráfica de usuario (Tkinter)
-├── main.py                     # Punto de entrada unificado (GUI, CLI, menú y tests)
-├── Dockerfile                  # Empaquetado Docker para ejecución sin Python
-├── docker-compose.yml          # Orquestación de Docker Compose
-├── EJECUTAR_ANALIZADOR_LU.bat  # Lanzador directo con 1 clic en Windows
-├── EJECUTAR_DEMO_CONSOLA.bat   # Lanzador directo de consola en Windows
-├── CHANGELOG.md                # Registro histórico de versiones
-└── README.md                   # Esta documentación
+├── core/
+│   ├── __init__.py           Punto de exportacion publico del paquete core.
+│   ├── models.py             Estructuras de datos (LUResult, SystemSolution) y tipos.
+│   ├── parsers.py            Lectura y transformacion de texto a matrices y vectores.
+│   ├── matrix_ops.py         Operaciones algebraicas basicas (multiplicacion, comparacion, identidad).
+│   ├── formatters.py         Alineacion de matrices en texto y generacion de reportes.
+│   ├── doolittle.py          Algoritmo de Doolittle sin pivoteo (A = L * U).
+│   ├── doolittle_pivot.py    Algoritmo de Doolittle con pivoteo parcial (P * A = L * U).
+│   └── linear_system.py      Resolucion del sistema lineal (L*y = P*b, U*x = y).
+├── examples/
+│   ├── __init__.py           Exportacion de casos de prueba.
+│   └── presets.py            Matrices precargadas (3x3 estandar, 3x3 pivote cero, 4x4 y 2x2).
+├── tests/
+│   ├── __init__.py           Inicializador de pruebas unitarias.
+│   ├── test_parsers.py       Validacion de lectura de datos numericos y formatos.
+│   ├── test_doolittle.py     Validacion del algoritmo de Doolittle clasico.
+│   ├── test_pivot.py         Validacion del algoritmo con pivoteo parcial.
+│   └── test_system.py        Validacion de resolucion de sistemas Ax = b.
+├── gui.py                    Interfaz grafica de usuario desarrollada en Tkinter.
+├── main.py                   Punto de entrada principal (GUI, CLI, menu y tests).
+├── generate_icon.py          Script de generacion de los iconos de la aplicacion.
+├── icon.ico / icon.png       Iconos oficiales del programa.
+├── Dockerfile                Definicion de contenedor Docker para ejecucion portable.
+├── docker-compose.yml        Orquestador de Docker Compose.
+├── .dockerignore             Archivos excluidos de la imagen Docker.
+├── .gitignore                Reglas de exclusion para el control de versiones Git.
+├── EJECUTAR_ANALIZADOR_LU.bat  Lanzador directo para la interfaz grafica en Windows.
+├── EJECUTAR_DEMO_CONSOLA.bat   Lanzador directo de la demostracion en consola en Windows.
+├── CHANGELOG.md              Registro historico de versiones del proyecto.
+└── README.md                 Documentacion tecnica del software.
+```
+
+### Descripcion de Modulos Principales
+
+- `core/models.py`: Define los tipos de datos principales (`Matrix`, `Vector`, `Number`) y las clases contenedoras de resultados (`LUResult` y `SystemSolution`).
+- `core/parsers.py`: Interpreta entradas de texto escritas por el usuario. Maneja elementos separados por espacios, comas, punto y coma, corchetes, fracciones como `3/4` y decimales con punto o coma.
+- `core/matrix_ops.py`: Contiene funciones matematicas base para la multiplicacion de matrices (`matmul`), multiplicacion matriz-vector (`mat_vec_mul`), generacion de matrices identidad y comparacion de matrices con tolerancia numerica.
+- `core/doolittle.py`: Ejecuta la factorizacion clasica de Doolittle. Calcula fila por fila la matriz triangular superior `U` y columna por columna los multiplicadores de la matriz triangular inferior `L` (con unos en la diagonal principal). Registra cada sustitucion analitica en un historial de pasos. Lanza una excepcion explicita si encuentra un pivote nulo.
+- `core/doolittle_pivot.py`: Aplica la eliminacion gaussiana con pivoteo parcial por columnas. Localiza el valor de mayor magnitud absoluta bajo la diagonal principal, permuta las filas correspondientes en la matriz de permutacion `P`, en la matriz de trabajo y en los coeficientes ya calculados de `L`, garantizando estabilidad numerica.
+- `core/linear_system.py`: Utiliza las matrices calculadas para resolver sistemas lineales:
+  1. Aplica la permutacion al vector de terminos independientes: `b* = P * b`.
+  2. Resuelve por sustitucion hacia adelante el sistema triangular inferior: `L * y = b*`.
+  3. Resuelve por sustitucion hacia atras el sistema triangular superior: `U * x = y`.
+- `core/formatters.py`: Transforma estructuras matriciales en texto con columnas monoespaciadas perfectamente alineadas y ensambla el reporte consolidado listo para copiar o exportar.
+- `gui.py`: Construye la interfaz visual mediante Tkinter. Gestiona la interaccion de la cuadricula de celdas, el editor de texto, los selectores de metodos y la visualizacion de resultados en pestañas independientes.
+
+---
+
+## 3. Fundamento Matematico
+
+### Metodo de Doolittle sin Pivoteo
+Dada una matriz cuadrada A de dimension n x n, se busca descomponerla en el producto:
+
+```text
+A = L * U
+```
+
+donde:
+- L es una matriz triangular inferior con diagonal unitaria (l_ii = 1 para todo i).
+- U es una matriz triangular superior (u_ij = 0 para todo i > j).
+
+Las formulas de calculo para la etapa k (k = 0, ..., n - 1) son:
+
+1. Elementos de la fila k de U:
+```text
+u_kj = a_kj - SUM(l_km * u_mj)  para j = k, ..., n - 1 (m desde 0 hasta k - 1)
+```
+
+2. Multiplicadores de la columna k de L:
+```text
+l_ik = (a_ik - SUM(l_im * u_mk)) / u_kk  para i = k + 1, ..., n - 1 (m desde 0 hasta k - 1)
+```
+
+Si en cualquier etapa el elemento pivote `u_kk` resulta ser igual a cero, la division no puede realizarse y el metodo requiere pivoteo parcial.
+
+### Metodo de Doolittle con Pivoteo Parcial
+Para evitar divisiones entre cero y reducir la propagacion de errores por redondeo, en cada etapa k se localiza el indice de fila p tal que:
+
+```text
+|a_pk| = max { |a_ik| } para i = k, ..., n - 1
+```
+
+Si p != k, se intercambia la fila k con la fila p en la matriz A, en la matriz de permutacion P y en los multiplicadores previos calculados en L. La relacion obtenida satisface:
+
+```text
+P * A = L * U
 ```
 
 ---
 
-## 🐳 Ejecución con Docker (Sin Python Instalado)
+## 4. Guia de Uso y Ejecucion
 
-Si no tienes Python instalado en tu máquina o prefieres aislar la ejecución, puedes usar Docker:
+### Opcion A: Ejecucion con Docker (No requiere Python instalado)
 
-### Opción 1: Con Docker Compose (Recomendado)
+Esta opcion permite ejecutar el software en cualquier equipo con Docker instalado, sin necesidad de configurar entornos de Python.
+
+1. Iniciar con Docker Compose:
 ```bash
 docker compose run --rm analizador-lu
 ```
-Iniciará el menú interactivo por terminal donde podrás seleccionar ver las demostraciones o ingresar cualquier matriz $N \times N$.
 
-### Opción 2: Construir y Ejecutar con Docker CLI
-1. Construir la imagen:
-   ```bash
-   docker build -t analizador-lu .
-   ```
-2. Ejecutar el menú interactivo:
-   ```bash
-   docker run -it --rm analizador-lu
-   ```
-3. Ejecutar solo las pruebas automáticas:
-   ```bash
-   docker run --rm analizador-lu --run-tests
-   ```
-4. Ejecutar la demostración rápida de matrices:
-   ```bash
-   docker run --rm analizador-lu --cli
-   ```
-
----
-
-## 💻 Ejecución Local
-
-### En Windows (Sin tocar comandos)
-- Haz doble clic sobre **`EJECUTAR_ANALIZADOR_LU.bat`** para abrir la interfaz gráfica.
-- Haz doble clic sobre **`EJECUTAR_DEMO_CONSOLA.bat`** para ver la demostración en consola.
-
-### Desde Terminal / PyCharm
+2. O compilar y ejecutar manualmente con la CLI de Docker:
 ```bash
-# Iniciar la interfaz gráfica
+docker build -t analizador-lu .
+docker run -it --rm analizador-lu
+```
+
+El contenedor iniciara un menu interactivo en terminal para elegir entre ver demostraciones, ingresar una matriz personalizada o correr la suite de pruebas.
+
+### Opcion B: Ejecucion en Windows con Doble Clic
+
+Si se dispone de Windows y se desea utilizar la interfaz grafica sin abrir consolas:
+- Haga doble clic sobre `EJECUTAR_ANALIZADOR_LU.bat` para iniciar la aplicacion grafica.
+- Haga doble clic sobre `EJECUTAR_DEMO_CONSOLA.bat` para ver la ejecucion de prueba en terminal.
+
+### Opcion C: Ejecucion por Linea de Comandos
+
+En cualquier terminal con Python 3.10 o superior:
+
+```bash
+# Iniciar la interfaz grafica
 python main.py
 
-# Iniciar en modo consola interactivo
+# Iniciar el menu interactivo en consola (ideal para terminales remotas)
 python main.py --menu
 
-# Ejecutar demostración en consola
+# Ejecutar la demostracion rapida de matrices de prueba
 python main.py --cli
 
-# Ejecutar la suite completa de pruebas unitarias (11 tests)
+# Ejecutar la suite de pruebas unitarias
 python main.py --run-tests
 ```
 
 ---
 
-## 🧪 Casos de Prueba y Resultados
+## 5. Casos de Prueba Verificados
 
-### Caso 1: Matriz 3×3 sin pivoteo ($A = L \cdot U$)
-$$A_1 = \begin{pmatrix} 2 & -1 & -2 \\ -4 & 6 & 3 \\ -4 & -2 & 8 \end{pmatrix}$$
+### Caso 1: Matriz 3x3 sin Pivoteo (Doolittle Clasico)
 
-- **Matriz $L$ (Triangular inferior unitaria):**
-  $$L = \begin{pmatrix} 1 & 0 & 0 \\ -2 & 1 & 0 \\ -2 & -1 & 1 \end{pmatrix}$$
-- **Matriz $U$ (Triangular superior):**
-  $$U = \begin{pmatrix} 2 & -1 & -2 \\ 0 & 4 & -1 \\ 0 & 0 & 3 \end{pmatrix}$$
-- **Verificación:** $L \cdot U = A_1$ $\checkmark$
-- **Determinante:** $\det(A_1) = 24$.
+Matriz de entrada:
+```text
+A = [  2  -1  -2 ]
+    [ -4   6   3 ]
+    [ -4  -2   8 ]
+```
+
+Resultados obtenidos:
+- Matriz L:
+```text
+L = [  1   0   0 ]
+    [ -2   1   0 ]
+    [ -2  -1   1 ]
+```
+- Matriz U:
+```text
+U = [  2  -1  -2 ]
+    [  0   4  -1 ]
+    [  0   0   3 ]
+```
+- Comprobacion: L * U coincide exactamente con la matriz original A.
+- Determinante: det(A) = 24.
 
 ---
 
-### Caso 2: Matriz 3×3 con pivoteo parcial ($P \cdot A = L \cdot U$)
-$$A_2 = \begin{pmatrix} 0 & 2 & 1 \\ 1 & -1 & 1 \\ 2 & 1 & -1 \end{pmatrix}$$
+### Caso 2: Matriz 3x3 con Pivote Inicial Cero (Requiere Pivoteo Parcial)
 
-*(Presenta $a_{11} = 0$, requiriendo permutación para evitar división entre cero).*
+Matriz de entrada:
+```text
+A = [  0   2   1 ]
+    [  1  -1   1 ]
+    [  2   1  -1 ]
+```
 
-- **Matriz de Permutación $P$:**
-  $$P = \begin{pmatrix} 0 & 0 & 1 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{pmatrix}$$
-- **Matriz $L$:**
-  $$L = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 1/2 & -3/4 & 1 \end{pmatrix}$$
-- **Matriz $U$:**
-  $$U = \begin{pmatrix} 2 & 1 & -1 \\ 0 & 2 & 1 \\ 0 & 0 & 9/4 \end{pmatrix}$$
-- **Verificación:** $L \cdot U = P \cdot A_2$ $\checkmark$
-- **Determinante:** $\det(A_2) = 9$.
+El elemento a_11 es igual a 0, por lo que el metodo sin pivoteo falla por division entre cero. Al aplicar pivoteo parcial, se intercambia la Fila 1 con la Fila 3.
+
+Resultados obtenidos:
+- Matriz de Permutacion P:
+```text
+P = [  0   0   1 ]
+    [  1   0   0 ]
+    [  0   1   0 ]
+```
+- Matriz L:
+```text
+L = [   1     0   0 ]
+    [   0     1   0 ]
+    [ 1/2  -3/4   1 ]
+```
+- Matriz U:
+```text
+U = [  2    1   -1 ]
+    [  0    2    1 ]
+    [  0    0  9/4 ]
+```
+- Comprobacion: L * U coincide exactamente con la matriz permutada P * A.
+- Determinante: det(A) = 9.
 
 ---
 
-## 🌐 Repositorio GitHub
+## 6. Pruebas Unitarias
 
-Repositorio oficial:
-👉 **[https://github.com/Quetzalq4321q/PROGRAMA-LU.git](https://github.com/Quetzalq4321q/PROGRAMA-LU.git)**
+El proyecto incluye 11 pruebas automatizadas que verifican el parseo de datos, la precision del calculo algebraico, el manejo de errores de pivote cero y la resolucion de sistemas lineales.
+
+Para ejecutarlas:
+```bash
+python main.py --run-tests
+```
+o mediante el modulo estandar de Python:
+```bash
+python -m unittest discover tests
+```
+
+---
+
+## 7. Repositorio
+
+Repositorio de control de versiones:
+https://github.com/Quetzalq4321q/PROGRAMA-LU.git

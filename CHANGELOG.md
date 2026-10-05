@@ -7,6 +7,15 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [1.2.1] - 2026-10-05
+
+### Añadido
+- **Iconografía Oficial de la Aplicación**: Generación de `icon.ico` e `icon.png` e integración en la barra de título y barra de tareas de la ventana en `gui.py`.
+- **Script Generador de Iconos**: Adición de `generate_icon.py` para la creación programática del arte del icono.
+- **Documentación Técnica Refinada**: Redacción de `README.md` exhaustivo sin emojis, con explicación sencilla del funcionamiento de cada módulo del código y fundamentación matemática.
+
+---
+
 ## [1.2.0] - 2026-10-05
 
 ### Añadido
