@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.idea/
+.git/
+.gitignore
+*.log
+EJECUTAR_*.bat
+README.md
+CHANGELOG.md

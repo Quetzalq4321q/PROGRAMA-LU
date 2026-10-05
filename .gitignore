@@ -1,0 +1,40 @@
+# ==============================================================================
+# Git Ignore para Analizador de Descomposición LU
+# ==============================================================================
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Archivos de caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Configuración de entornos de desarrollo (PyCharm / VS Code)
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de logs y temporales
+*.log
+*.tmp
+*.bak
+
+# Empaquetado / Distribución
+build/
+dist/
+*.egg-info/
+*.spec
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+Desktop.ini

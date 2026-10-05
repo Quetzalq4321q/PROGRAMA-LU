@@ -1,0 +1,8 @@
+services:
+  analizador-lu:
+    build: .
+    image: analizador-lu:latest
+    container_name: analizador_lu
+    stdin_open: true
+    tty: true
+    command: ["--menu"]
